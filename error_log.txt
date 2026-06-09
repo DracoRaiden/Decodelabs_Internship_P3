@@ -1,0 +1,50 @@
+================================================================================
+                       PROJECT ERROR & RESOLUTION LOG
+                       Project: Tech Stack Recommender
+                       Platform: Windows | Python 3.13.7 | Poetry 2.4.1
+================================================================================
+
+Below is a detailed log of each error encountered during the setup and validation of the Tech Stack Recommender system, along with their root causes and structural fixes:
+
+
+1. ERROR: NumPy Source Compilation Failure / Windows Permission Block
+--------------------------------------------------------------------------------
+* Phase: Environment & Dependency Installation (Step 1)
+* Error Output:
+  "PermissionError: [WinError 5] Access is denied: 'C:\\Users\\PAK\\AppData\\Local\\Temp\\tmpuh82ka47\\numpy-1.26.4\\.mesonpy-mhb112ar\\meson-private\\sanitycheckcpp.exe'"
+  "Cannot install numpy."
+* Root Cause: 
+  The project environment runs Python 3.13.7. The initial pyproject.toml specified NumPy version ^1.26.0. Because NumPy 1.26.x does not have pre-built binary wheels for Python 3.13 on Windows, Poetry was forced to compile the package from source using its meson build backend. This source build triggered compiler sanity checks that ran into Windows folder access restrictions inside the AppData Temp directories, throwing a permission denial error.
+* Resolution: 
+  Modified `pyproject.toml` dependencies to require:
+    - numpy = "^2.1.0"
+    - pandas = "^2.2.3"
+  NumPy version 2.1.0+ includes pre-built binary wheels explicitly built for Python 3.13 on Windows. This allowed Poetry to download and extract the precompiled binaries directly, completely bypassing any compiler invocation and avoiding Windows temp directory permission checks.
+
+
+2. ERROR: Poetry Packaging Root Lookup Failure
+--------------------------------------------------------------------------------
+* Phase: Poetry Virtual Environment Setup (Step 1)
+* Error Output:
+  "Error: The current project could not be installed: No file/folder found for package tech-stack-recommender"
+* Root Cause: 
+  Poetry 2.x operates in packaging mode by default. It expects a Python package structure (a directory matching the name 'tech-stack-recommender' or 'tech_stack_recommender') in the root directory to install as a distributable package. Since the project structure is designed as a standalone web application (with files inside the `app/` folder) rather than a library package, Poetry failed when searching for a project package root.
+* Resolution: 
+  Added the following configuration to `pyproject.toml` under the `[tool.poetry]` section:
+    `package-mode = false`
+  This tells Poetry to only manage dependencies and run the virtual environment, disabling distributable package compilation.
+
+
+3. ERROR: UnicodeEncodeError on Windows Console during Math Verification
+--------------------------------------------------------------------------------
+* Phase: Math Engine Validation (Step 4)
+* Error Output:
+  "UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>"
+* Root Cause: 
+  The mathematical verification script `verify_engine.py` printed a unicode checkmark character (✓ or '\u2713') to signal passing tests. The default Windows console encoding (CP1252) does not support high-unicode characters, causing the python process to crash while writing to standard output.
+* Resolution: 
+  Rewrote the print statements in `verify_engine.py` to replace the unicode checkmark with standard ASCII brackets:
+    - Changed `\u2713 Test 1 Passed` to `[PASS] Test 1 Passed`
+    - Changed `ALL MATHEMATICAL TESTS PASSED SUCCESSFULLY! ✓` to `ALL MATHEMATICAL TESTS PASSED SUCCESSFULLY! [OK]`
+  This resolved the terminal encoding crash, allowing the test suite to execute and display results successfully.
+================================================================================

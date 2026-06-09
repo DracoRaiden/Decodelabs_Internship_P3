@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechMatch AI - Intelligent Tech Stack Matchmaker</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="An active prediction tool matching raw skills, career goals, and interests to industry-standard tech stacks and job roles using TF-IDF and Cosine Similarity.">
+    <meta name="author" content="Ammar">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <!-- Background grid & glow effects -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-grid"></div>
+
+    <div class="app-container">
+        <!-- Navigation Header -->
+        <header class="main-header">
+            <div class="logo">
+                <span class="logo-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                <h1 id="app-title">TechMatch <span class="accent-text">AI</span></h1>
+            </div>
+            <div class="header-badge">
+                <span class="badge-dot"></span>
+                <span>Active Recommendation Engine</span>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+
+            <!-- SECTION 1: ONBOARDING SURVEY (COLD START SOLVER) -->
+            <section id="onboarding-section" class="onboarding-card active">
+                <div class="onboarding-header">
+                    <span class="step-indicator">Step <span id="current-step-num">1</span> of 3</span>
+                    <h2 id="onboarding-title">Let's Cure Choice Overload</h2>
+                    <p id="onboarding-subtitle">Your recommendation profile is currently a vector of zeros. Let's seed
+                        it with initial data.</p>
+                </div>
+
+                <!-- Step Progress Bar -->
+                <div class="progress-bar-container">
+                    <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                </div>
+
+                <!-- Onboarding Step Contents -->
+                <div class="steps-container">
+                    <!-- Step 1: Industry Selection -->
+                    <div id="step-1" class="step-content active">
+                        <h3>1. Select your preferred fields of interest</h3>
+                        <p class="step-desc">This helps initialize your preference weights. Select at least one.</p>
+                        <div class="interests-grid" id="interest-selection-grid">
+                            <div class="interest-card" data-val="artificial-intelligence" id="card-ai">
+                                <div class="card-icon"><i class="fa-solid fa-brain"></i></div>
+                                <h4>AI & Machine Learning</h4>
+                                <p>Deep learning, LLMs, statistics, neural networks</p>
+                            </div>
+                            <div class="interest-card" data-val="web-dev" id="card-web">
+                                <div class="card-icon"><i class="fa-solid fa-code"></i></div>
+                                <h4>Web Development</h4>
+                                <p>Frontend, backend, REST APIs, SPA architectures</p>
+                            </div>
+                            <div class="interest-card" data-val="devops" id="card-devops">
+                                <div class="card-icon"><i class="fa-solid fa-infinity"></i></div>
+                                <h4>DevOps & Cloud</h4>
+                                <p>Infrastructure as code, CI/CD, servers, containers</p>
+                            </div>
+                            <div class="interest-card" data-val="cyber-security" id="card-security">
+                                <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                                <h4>Cybersecurity</h4>
+                                <p>Penetration testing, cryptography, network protection</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Skill Ingestion -->
+                    <div id="step-2" class="step-content">
+                        <h3>2. Select or enter your current skills</h3>
+                        <p class="step-desc">Choose from popular tech skills or type custom ones below. Need at least 3
+                            total tokens across all inputs for sufficient density.</p>
+
+                        <div class="preset-skills-container">
+                            <h4>Popular technologies in our database:</h4>
+                            <div class="preset-skills-grid" id="preset-skills-grid">
+                                <!-- JavaScript, Python, AWS, Docker, React, etc. (Dynamically injected or hardcoded) -->
+                                <button type="button" class="preset-chip" data-skill="python"
+                                    id="preset-python">Python</button>
+                                <button type="button" class="preset-chip" data-skill="javascript"
+                                    id="preset-js">JavaScript</button>
+                                <button type="button" class="preset-chip" data-skill="typescript"
+                                    id="preset-ts">TypeScript</button>
+                                <button type="button" class="preset-chip" data-skill="react"
+                                    id="preset-react">React</button>
+                                <button type="button" class="preset-chip" data-skill="docker"
+                                    id="preset-docker">Docker</button>
+                                <button type="button" class="preset-chip" data-skill="kubernetes"
+                                    id="preset-k8s">Kubernetes</button>
+                                <button type="button" class="preset-chip" data-skill="aws" id="preset-aws">AWS</button>
+                                <button type="button" class="preset-chip" data-skill="sql" id="preset-sql">SQL</button>
+                                <button type="button" class="preset-chip" data-skill="tensorflow"
+                                    id="preset-tf">TensorFlow</button>
+                                <button type="button" class="preset-chip" data-skill="pytorch"
+                                    id="preset-pytorch">PyTorch</button>
+                                <button type="button" class="preset-chip" data-skill="linux"
+                                    id="preset-linux">Linux</button>
+                                <button type="button" class="preset-chip" data-skill="fastapi"
+                                    id="preset-fastapi">FastAPI</button>
+                            </div>
+                        </div>
+
+                        <div class="custom-input-group">
+                            <label for="input-custom-skills">Or enter custom skills (comma or space separated):</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="input-custom-skills"
+                                    placeholder="e.g., rust, git, pandas, nextjs..." autocomplete="off">
+                                <button type="button" id="btn-add-custom-skill" class="btn-secondary">Add</button>
+                            </div>
+                        </div>
+
+                        <div class="active-tags-wrapper">
+                            <span>Selected Skills:</span>
+                            <div class="tags-container" id="onboarding-skills-tags">
+                                <!-- Dynamic tags go here -->
+                                <span class="no-tags-placeholder">No skills selected yet.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Define Goals -->
+                    <div id="step-3" class="step-content">
+                        <h3>3. Define your ultimate career goals</h3>
+                        <p class="step-desc">What do you want to accomplish in your next project or role?</p>
+
+                        <div class="goals-options-list">
+                            <div class="goal-option-row">
+                                <input type="checkbox" id="goal-ai-models"
+                                    value="train machine learning neural network models predictive data"
+                                    name="goal-choices">
+                                <label for="goal-ai-models">Train machine learning, neural networks, or predictive AI
+                                    models</label>
+                            </div>
+                            <div class="goal-option-row">
+                                <input type="checkbox" id="goal-web-interfaces"
+                                    value="build interactive web UI responsive frontend nextjs client"
+                                    name="goal-choices">
+                                <label for="goal-web-interfaces">Build beautiful, interactive frontend user interfaces
+                                    and single-page web apps</label>
+                            </div>
+                            <div class="goal-option-row">
+                                <input type="checkbox" id="goal-backend-servers"
+                                    value="design server side database systems rest api architecture microservices"
+                                    name="goal-choices">
+                                <label for="goal-backend-servers">Design microservices, rest APIs, databases, and
+                                    high-performance server logic</label>
+                            </div>
+                            <div class="goal-option-row">
+                                <input type="checkbox" id="goal-cloud-ops"
+                                    value="automate docker kubernetes cluster deployment ci-cd cloud pipeline infrastructure"
+                                    name="goal-choices">
+                                <label for="goal-cloud-ops">Automate code deployments, manage cloud platforms, scale
+                                    Docker/Kubernetes clusters</label>
+                            </div>
+                            <div class="goal-option-row">
+                                <input type="checkbox" id="goal-security"
+                                    value="audit network security systems cryptography penetration testing vulnerability defense"
+                                    name="goal-choices">
+                                <label for="goal-security">Perform penetration testing, audit software systems, secure
+                                    data and networks from threats</label>
+                            </div>
+                        </div>
+
+                        <div class="custom-goals-group">
+                            <label for="input-custom-goals">Or write a short target goal statement:</label>
+                            <input type="text" id="input-custom-goals"
+                                placeholder="e.g., build secure high-speed APIs or train deep learning vision systems"
+                                class="full-width-input">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Onboarding Footer Buttons -->
+                <div class="onboarding-footer">
+                    <button type="button" id="btn-prev-step" class="btn-text-nav hidden" disabled><i
+                            class="fa-solid fa-arrow-left"></i> Back</button>
+                    <button type="button" id="btn-next-step" class="btn-primary">Next <i
+                            class="fa-solid fa-arrow-right"></i></button>
+                    <button type="button" id="btn-submit-onboarding" class="btn-accent hidden">Generate Recommendations
+                        <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                </div>
+            </section>
+
+            <!-- SECTION 2: DYNAMIC PREDICTION DASHBOARD -->
+            <section id="dashboard-section" class="dashboard-grid">
+
+                <!-- Left Sidebar: Profile Tuning Panel -->
+                <div class="dashboard-sidebar">
+                    <div class="sidebar-card profile-panel">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-sliders"></i> Adjust Your Profile</h3>
+                            <button type="button" id="btn-reset-survey" class="btn-text-action"
+                                title="Rerun onboarding survey"><i class="fa-solid fa-rotate-left"></i> Restart
+                                Survey</button>
+                        </div>
+
+                        <div class="profile-input-block">
+                            <label for="dashboard-skills-input">
+                                <span><i class="fa-solid fa-code"></i> Skills & Platforms</span>
+                                <span class="help-tooltip"
+                                    title="Specific languages, frameworks, or databases you know."><i
+                                        class="fa-regular fa-circle-question"></i></span>
+                            </label>
+                            <div class="tag-input-container">
+                                <div class="tags-container" id="dashboard-skills-tags">
+                                    <!-- Dynamic tags -->
+                                </div>
+                                <div class="input-wrapper">
+                                    <input type="text" id="dashboard-skills-input"
+                                        placeholder="Type a skill & press Enter..." autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-input-block">
+                            <label for="dashboard-interests-input">
+                                <span><i class="fa-solid fa-heart"></i> Interests & Fields</span>
+                                <span class="help-tooltip" title="High-level fields of computing you find exciting."><i
+                                        class="fa-regular fa-circle-question"></i></span>
+                            </label>
+                            <div class="tag-input-container">
+                                <div class="tags-container" id="dashboard-interests-tags">
+                                    <!-- Dynamic tags -->
+                                </div>
+                                <div class="input-wrapper">
+                                    <input type="text" id="dashboard-interests-input"
+                                        placeholder="Type an interest & press Enter..." autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-input-block">
+                            <label for="dashboard-goals-input">
+                                <span><i class="fa-solid fa-bullseye"></i> Target Career Goals</span>
+                                <span class="help-tooltip" title="Responsibilities or features you want to build."><i
+                                        class="fa-regular fa-circle-question"></i></span>
+                            </label>
+                            <div class="tag-input-container">
+                                <div class="tags-container" id="dashboard-goals-tags">
+                                    <!-- Dynamic tags -->
+                                </div>
+                                <div class="input-wrapper">
+                                    <input type="text" id="dashboard-goals-input"
+                                        placeholder="Type a goal keyword & press Enter..." autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-input-block control-block">
+                            <div class="label-row">
+                                <label for="slider-top-n"><i class="fa-solid fa-list-ol"></i> Limit Results
+                                    (Top-N)</label>
+                                <span id="top-n-value" class="slider-val">3</span>
+                            </div>
+                            <input type="range" id="slider-top-n" min="1" max="10" value="3" step="1"
+                                class="neon-slider">
+                            <span class="control-help">Prevents choice overload by truncating results.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Area: Recommendations & Math Breakdown -->
+                <div class="dashboard-main">
+                    <!-- Recommendation List Header -->
+                    <div class="results-header">
+                        <h2><i class="fa-solid fa-graduation-cap"></i> Recommended Roles & Tech Stacks</h2>
+                        <div class="results-meta">
+                            <span>Computed via <strong class="neon-text">TF-IDF Vector Mapping & Cosine
+                                    Similarity</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations Container -->
+                    <div class="recommendations-list" id="recommendations-container">
+                        <!-- Recommendation cards will be dynamically generated here -->
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p>Calculating similarities...</p>
+                        </div>
+                    </div>
+
+                    <!-- Math Engine Explainer Panel -->
+                    <div class="math-explainer-card">
+                        <div class="math-explainer-header" id="math-header-toggle">
+                            <h3><i class="fa-solid fa-calculator"></i> Under the Hood: The Similarity Engine</h3>
+                            <span class="toggle-icon"><i class="fa-solid fa-chevron-down"></i></span>
+                        </div>
+                        <div class="math-explainer-content" id="math-content-panel">
+                            <p>Here is how the matching engine processed your query:</p>
+                            <div class="formula-box">
+                                <div class="formula-title">Cosine Similarity Formula</div>
+                                <div class="formula-math">
+                                    cos(theta) = frac{\mathbf{A} \cdot \mathbf{B}}{\|\mathbf{A}\| \|\mathbf{B}\|} =
+                                    \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \sqrt{\sum_{i=1}^{n}
+                                    B_i^2}}$$
+                                </div>
+                                <p class="formula-desc">Computes the angular alignment between your profile vector
+                                    $\mathbf{A}$ and the role database vector $\mathbf{B}$, ignoring magnitude skew.</p>
+                            </div>
+                            <div class="math-steps">
+                                <div class="math-step">
+                                    <span class="step-num">1</span>
+                                    <div class="step-text">
+                                        <strong>Text Cleaning & Tokenization:</strong> Your inputs were cleaned,
+                                        stripped of generic stop words (e.g. <em>developer</em>, <em>system</em>), and
+                                        split into standard tags.
+                                    </div>
+                                </div>
+                                <div class="math-step">
+                                    <span class="step-num">2</span>
+                                    <div class="step-text">
+                                        <strong>TF-IDF Weighting:</strong> Words in your profile and dataset roles were
+                                        converted into high-dimensional vectors. Rare, highly descriptive words (like
+                                        <em>kubernetes</em> or <em>pytorch</em>) receive heavier TF-IDF weights, while
+                                        common terms are penalized.
+                                    </div>
+                                </div>
+                                <div class="math-step">
+                                    <span class="step-num">3</span>
+                                    <div class="step-text">
+                                        <strong>Cosine Score Matrix:</strong> The system computed the dot product of
+                                        your vector and each role's vector, divided by their Euclidean magnitudes.
+                                    </div>
+                                </div>
+                                <div class="math-step">
+                                    <span class="step-num">4</span>
+                                    <div class="step-text">
+                                        <strong>Truncated Filtering:</strong> The roles were sorted descending, and cut
+                                        off at the selected **Top-N** limit to cure choice overload.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+
+        <!-- Application Footer -->
+        <footer class="main-footer">
+            <p>Project 3: AI Recommendation Logic | Batch 2026</p>
+            <p>Powered by <strong>DecodeLabs Industrial Training Kit</strong></p>
+        </footer>
+    </div>
+
+    <!-- JS script -->
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>
